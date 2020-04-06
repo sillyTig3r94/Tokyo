@@ -1,8 +1,9 @@
-﻿#define DISPLAY
+﻿//#define DISPLAY
 //#define MSG
 #define DEF_LIST
 #define DEF_VAR
 #define DEF_OBJ
+//#define SET_ICON
 //#define MSG_TOOLNAME
 #define DEF_SIZE_1
 //define DEF_SIZE_2
@@ -92,43 +93,31 @@ namespace BHA
         /*
          * this is my list object for this project
          */
-        List<GroupBox> myNodeList = new List<GroupBox>();
+        List<GroupBox> Nodes = new List<GroupBox>();
 
-        List<Button> myModuleList = new List<Button>();
+        List<Button> Modules = new List<Button>();
 
-        List<bool> myAvailableNode = new List<bool>();
+        List<Label> myResultList = new List<Label>();
 
-        List<int> myModuleLoc = new List<int>();
+        List<bool> availableNodes = new List<bool>();
 
-        List<moduleObject> myToolString = new List<moduleObject>();
+        List<int> modLocations = new List<int>();
+
+        List<ToolParams> Tools = new List<ToolParams>();
+
+        List<ToolParams> toolConfigs = new List<ToolParams>();
+
+        List<string> uphole_tools = new List<string>();
+
+        List<string> dwhole_tools = new List<string>();
 
         List<string> tool_data = new List<string>();
-
-        List<int> id_list = new List<int>();
-
-        List<string> name_list = new List<string>();
-
-        List<int> opvoltage_list = new List<int>();
-
-        List<int> maxvoltage_list = new List<int>();
-
-        List<int> minvoltage_list = new List<int>();
-
-        List<int> resistance_list = new List<int>();
-
-        List<int> power_list = new List<int>();
-
-        List<int> length_list = new List<int>();
-
-        List<bool> sink_list = new List<bool>();
-
-        List<bool> source_list = new List<bool>();
 #endif
 
         /*
          * this my tool object 
          */
-        public class moduleObject
+        public class ToolParams
         {
             public int id { get; set; }
             public string toolName { get; set; }
@@ -141,7 +130,7 @@ namespace BHA
             public bool sink { get; set; }
             public bool source { get; set; }
 
-            public moduleObject(int id, string name, int OpVolt, int MaxVolt, int MinVolt, int Watt, int Res, int len, bool Sink, bool Source)
+            public ToolParams(int id, string name, int OpVolt, int MaxVolt, int MinVolt, int Watt, int Res, int len, bool Sink, bool Source)
             {
                 this.id = id;
 
@@ -193,20 +182,34 @@ namespace BHA
                 /*
                  * Assign my shitty list here
                  */
-                id_list.Add(Convert.ToInt32(words[0]));
-                name_list.Add(words[1]);
-                opvoltage_list.Add(Convert.ToInt32(words[2]));
-                maxvoltage_list.Add(Convert.ToInt32(words[3]));
-                minvoltage_list.Add(Convert.ToInt32(words[4]));
-                power_list.Add(Convert.ToInt32(words[5]));
-                resistance_list.Add(Convert.ToInt32(words[6]));
-                length_list.Add(Convert.ToInt32(words[7]));
-                sink_list.Add(Convert.ToBoolean(words[8]));
-                source_list.Add(Convert.ToBoolean(words[9]));
+                ToolParams tool = new ToolParams(
+                    Convert.ToInt32(words[0]),
+                    words[1],
+                    Convert.ToInt32(words[2]),
+                    Convert.ToInt32(words[3]),
+                    Convert.ToInt32(words[4]),
+                    Convert.ToInt32(words[5]),
+                    Convert.ToInt32(words[6]),
+                    Convert.ToInt32(words[7]),
+                    Convert.ToBoolean(words[8]),
+                    Convert.ToBoolean(words[9]));
+
+                toolConfigs.Add(tool);
+
+                //id_list.Add(Convert.ToInt32(words[0]));
+                //name_list.Add(words[1]);
+                //opvoltage_list.Add(Convert.ToInt32(words[2]));
+                //maxvoltage_list.Add(Convert.ToInt32(words[3]));
+                //minvoltage_list.Add(Convert.ToInt32(words[4]));
+                //power_list.Add(Convert.ToInt32(words[5]));
+                //resistance_list.Add(Convert.ToInt32(words[6]));
+                //length_list.Add(Convert.ToInt32(words[7]));
+                //sink_list.Add(Convert.ToBoolean(words[8]));
+                //source_list.Add(Convert.ToBoolean(words[9]));
             }
 
             /* Create the list of available tool module */
-            for (int numModule = 0; numModule < name_list.Count; numModule++)
+            for (int numModule = 0; numModule < toolConfigs.Count(); numModule++)
             {
                 string tool_name = String.Empty;
                 /* update location for next node */
@@ -216,41 +219,59 @@ namespace BHA
                 /* add properties */
                 module_drag.Size = myModule_Size;
                 module_drag.Location = nextModule_Loc; //default location
-                module_drag.Name = "module_" + name_list[numModule];
-                tool_name = name_list[numModule];
+                module_drag.Name = "module_" + toolConfigs[numModule].toolName;
+                tool_name = toolConfigs[numModule].toolName;
 
 #if MSG_TOOLNAME
                 MessageBox.Show(tool_name);
 #endif
+
+#if SET_ICON
+
+
                 /* adding icon for my tool */
                 try
                 {
                     switch (tool_name)
                     {
-                        case "GeoPilot":
-                            module_drag.BackgroundImage = Image.FromFile(myPath + @"\Tool Icon\tool_geopilot.png");
+                        case "GP9600":
+                            module_drag.BackgroundImage = Image.FromFile(myPath + @"\Tool Icon\tool_gp9600.png");
                             module_drag.Text = String.Empty;
                             break;
-                        case "RSS":
-                            module_drag.BackgroundImage = Image.FromFile(myPath + @"\Tool Icon\tool_rss.png");
+                        case "Muscat":
+                            module_drag.BackgroundImage = Image.FromFile(myPath + @"\Tool Icon\tool_muscat.png");
                             module_drag.Text = String.Empty;
                             break;
-                        case "Directional":
-                            module_drag.BackgroundImage = Image.FromFile(myPath + @"\Tool Icon\tool_directional.png");
+                        case "RioBase":
+                            module_drag.BackgroundImage = Image.FromFile(myPath + @"\Tool Icon\tool_riobase.png");
                             module_drag.Text = String.Empty;
                             break;
-                        case "Gamma":
-                            module_drag.BackgroundImage = Image.FromFile(myPath + @"\Tool Icon\tool_gamma.png");
+                        case "RioNuke":
+                            module_drag.BackgroundImage = Image.FromFile(myPath + @"\Tool Icon\tool_rionuke.png");
                             module_drag.Text = String.Empty;
                             break;
-                        case "EarthStarTx":
-                            module_drag.BackgroundImage = Image.FromFile(myPath + @"\Tool Icon\tool_earthstartTx.png");
+                        case "Yoko":
+                            module_drag.BackgroundImage = Image.FromFile(myPath + @"\Tool Icon\tool_yoko.png");
+                            module_drag.Text = String.Empty;
                             break;
-                        case "EarthStarRx":
-                            module_drag.BackgroundImage = Image.FromFile(myPath + @"\Tool Icon\tool_earthstartRx.png");
+                        case "AFR":
+                            module_drag.BackgroundImage = Image.FromFile(myPath + @"\Tool Icon\tool_afr.png");
+                            module_drag.Text = String.Empty;
                             break;
-                        case "Generator":
-                            module_drag.BackgroundImage = Image.FromFile(myPath + @"\Tool Icon\tool_generator.png");
+                        case "ESTX":
+                            module_drag.BackgroundImage = Image.FromFile(myPath + @"\Tool Icon\tool_estx.png");
+                            break;
+                        case "ESRX1":
+                            module_drag.BackgroundImage = Image.FromFile(myPath + @"\Tool Icon\tool_esrx1.png");
+                            break;
+                        case "ESRX2":
+                            module_drag.BackgroundImage = Image.FromFile(myPath + @"\Tool Icon\tool_esrx2.png");
+                            break;
+                        case "Brussels":
+                            module_drag.BackgroundImage = Image.FromFile(myPath + @"\Tool Icon\tool_brussels.png");
+                            break;
+                        case "XBAT":
+                            module_drag.BackgroundImage = Image.FromFile(myPath + @"\Tool Icon\tool_xbat.png");
                             break;
                         default:
                             module_drag.Text = name_list[numModule];
@@ -264,6 +285,9 @@ namespace BHA
                     // MessageBox.Show("No icon found for " + tool_name);
                     module_drag.Text = name_list[numModule];
                 }
+#else
+                module_drag.Text = toolConfigs[numModule].toolName; ;
+#endif
                 module_drag.Tag = (numModule + 1).ToString();
                 /* add drag-drop event */
                 module_drag.MouseDown += new System.Windows.Forms.MouseEventHandler(this.module_drag_MouseDown);
@@ -273,7 +297,7 @@ namespace BHA
                 /* add new module to my form */
                 //this.Controls.Add(module_drag);
                 this.Controls.Add(module_drag);
-                myModuleList.Add(module_drag);
+                Modules.Add(module_drag);
             }
 
             /*
@@ -310,7 +334,7 @@ namespace BHA
              * Re-size my form here
              */
 
-            this.Size = new Size(myModuleList.Count() * (myModule_Size.Width + 2 * myModule_Size.Width / 10), this.Height);
+            this.Size = new Size(Modules.Count() * (myModule_Size.Width + 2 * myModule_Size.Width / 10), this.Height);
 #if DISPLAY
             this.Size = new Size(this.Width, this.Height + groupBox_Debug.Height + 50);
 #endif
@@ -324,8 +348,9 @@ namespace BHA
              * number node added cannot more than number of
              * available tool
              */
-            if (numTool < name_list.Count)    //check only add less than available tool
+            if (numTool < toolConfigs.Count)    //check only add less than available tool
             {
+                bt_addNode.Enabled = true;
                 /* Create Node Framework */
                 nextNode_Loc = myNode_Loc;
                 GroupBox node_frame = new GroupBox();
@@ -338,20 +363,24 @@ namespace BHA
                 node_frame.SendToBack();
                 /* add node frame to my form */
                 this.Controls.Add(node_frame);
-                myNodeList.Add(node_frame);
+                Nodes.Add(node_frame);
                 /* increase index and update location for next node */
                 numTool++;
                 myNode_Loc.X = DEF_NodeLoc.X + numTool * (myNode_Size.Width + myNode_Size.Width / 10); //update location for next node
                 /* Create my avaiable Node */
-                myAvailableNode.Add(false); //default 
-                myModuleLoc.Add(0); // default
+                availableNodes.Add(false); //default 
+                modLocations.Add(0); // default
+            }
+            else
+            {
+                bt_addNode.Enabled = false;
             }
 
             /*
              * if the we have more node in our list then enable our 
              * remove button
              */
-            if (myNodeList.Count != 0)
+            if (Nodes.Count != 0)
                 bt_removeNode.Enabled = true;
             else
                 bt_removeNode.Enabled = false;
@@ -359,7 +388,7 @@ namespace BHA
             /*
              * update confirm button status 
              */
-            foreach (var item in myAvailableNode)
+            foreach (var item in availableNodes)
             {
                 if (item == false)
                 {
@@ -373,10 +402,12 @@ namespace BHA
                 }
             }
 
+            add_remove_result(uphole_tools, dwhole_tools, false);
+
             /*
              * Resize my Form when add node is pressed 
              */
-            var size_width = myNodeList.Count() * (myNode_Size.Width + myNode_Size.Width / 10) + 2 * DEF_NodeLoc.X;
+            var size_width = Nodes.Count() * (myNode_Size.Width + myNode_Size.Width / 10) + 2 * DEF_NodeLoc.X;
             if(size_width > this.Width)
                 this.Size = new Size(size_width, this.Height);
 
@@ -388,14 +419,14 @@ namespace BHA
             /*
              * remove the node out of my form
              */
-            this.Controls.Remove(myNodeList[myNodeList.Count - 1]);
+            this.Controls.Remove(Nodes[Nodes.Count - 1]);
 
             /*
              * remove the node out of my list of object
              */
-            myNodeList.RemoveAt(myNodeList.Count - 1);
-            myAvailableNode.RemoveAt(myAvailableNode.Count - 1);
-            myModuleLoc.RemoveAt(myModuleLoc.Count - 1);
+            Nodes.RemoveAt(Nodes.Count - 1);
+            availableNodes.RemoveAt(availableNodes.Count - 1);
+            modLocations.RemoveAt(modLocations.Count - 1);
 
             /* 
              * increase index and update location for next node 
@@ -410,15 +441,21 @@ namespace BHA
             /*
              * disable if the node is back to zero, otherwise keep it active
              */
-            if (myNodeList.Count == 0)
+            if (Nodes.Count == 0)
+            {
                 bt_removeNode.Enabled = false;
+            }
             else
+            {
                 bt_removeNode.Enabled = true;
+                bt_addNode.Enabled = true;
+            }
+                
 
             /*
              * update confirm button status 
              */
-            foreach (var item in myAvailableNode)
+            foreach (var item in availableNodes)
             {
                 if (item == false)
                 {
@@ -433,12 +470,14 @@ namespace BHA
 
             }
 
+            add_remove_result(uphole_tools, dwhole_tools, false);
+
             /*
              * Resize my form when remove node is pressed
              */
-            var size_width = myNodeList.Count() * (myNode_Size.Width + myNode_Size.Width / 10) + 2 * DEF_NodeLoc.X;
-            if (size_width > (myModuleList.Count * (myModule_Size.Width + myModule_Size.Width / 10) + DEF_ModuleLoc.X))
-                this.Size = new Size(this.Width - (myNode_Size.Width + myNode_Size.Width / 10), this.Height);
+            var size_width = Nodes.Count() * (myNode_Size.Width + myNode_Size.Width / 10) + 2 * DEF_NodeLoc.X;
+            if (size_width > (Modules.Count * (myModule_Size.Width + myModule_Size.Width / 10) + DEF_ModuleLoc.X))
+                this.Size = new Size(this.Width - (myNode_Size.Width + myNode_Size.Width / 10) + DEF_ModuleLoc.X / 2, this.Height);
         }
 
         /* Button click event to confirm the tool selection on each node */
@@ -447,25 +486,25 @@ namespace BHA
             /*
              * remove all my tool everytime user confirm new setup
              */
-            myToolString.Clear();   // just in case
+            Tools.Clear();   // just in case
 
             /*
              * loop to add properties for my tool
              */
-            foreach (var ToolId in myModuleLoc)
+            foreach (var ToolId in modLocations)
             {
-                moduleObject module = new moduleObject(
-                id_list[ToolId - 1],
-                name_list[ToolId - 1],
-                opvoltage_list[ToolId - 1],
-                maxvoltage_list[ToolId - 1],
-                minvoltage_list[ToolId - 1],
-                power_list[ToolId - 1],
-                resistance_list[ToolId - 1],
-                length_list[ToolId - 1],
-                source_list[ToolId - 1],
-                sink_list[ToolId - 1]);
-                myToolString.Add(module);
+                //ToolParams module = new ToolParams(
+                //id_list[ToolId - 1],
+                //name_list[ToolId - 1],
+                //opvoltage_list[ToolId - 1],
+                //maxvoltage_list[ToolId - 1],
+                //minvoltage_list[ToolId - 1],
+                //power_list[ToolId - 1],
+                //resistance_list[ToolId - 1],
+                //length_list[ToolId - 1],
+                //source_list[ToolId - 1],
+                //sink_list[ToolId - 1]);
+                Tools.Add(toolConfigs[ToolId-1]);
             }
 
             /*
@@ -477,7 +516,7 @@ namespace BHA
             /*
              * only for debug, nothing special
              */
-            foreach (var newtool in myToolString)
+            foreach (var newtool in Tools)
             {
                 debug_toolName.Text += " " + newtool.toolName;
                 debug_toolVoltage.Text += " " + newtool.opVolt;
@@ -516,7 +555,7 @@ namespace BHA
              * will use/read to execute
              */
             File.WriteAllText(python_path + @"\tools_setup.txt", string.Empty);
-            foreach (var newtool in myToolString)
+            foreach (var newtool in Tools)
             {
                 File.AppendAllText(python_path + @"\tools_setup.txt",newtool.toolName + Environment.NewLine);
             }
@@ -525,7 +564,7 @@ namespace BHA
             /* 
              * Create batch file that run my python script
              */
-            sw.WriteLine(root_path);
+            // sw.WriteLine(root_path);
             sw.WriteLine("cd " + python_path);
             sw.WriteLine(@"python ltspice.py");
             sw.Close();
@@ -543,9 +582,11 @@ namespace BHA
                 python_script.WaitForExit();
                 // MessageBox.Show("Bat file executed !!");
 
-                read_script(python_path, "uphole_result.txt",true);
+                uphole_tools = get_tool_ltspice(python_path, "uphole_result.txt",false);
 
-                read_script(python_path, "downhole_result.txt",false);
+                dwhole_tools = get_tool_ltspice(python_path, "downhole_result.txt",true);
+
+                add_remove_result(uphole_tools, dwhole_tools,true);
 
             }
             catch (Exception ex)
@@ -554,22 +595,124 @@ namespace BHA
             }
         }
 
-        private void read_script(string path,string str_file,bool downhole)
+        private List<string> get_tool_ltspice(string path,string str_file,bool downhole)
         {
             /* 
              * read data information in the text file first  
              */
             StreamReader datafile = new StreamReader(path + @"\" + str_file); //should use relative path here
 
+            List<string> uphole_tools = new List<string>();
+
+            List<string> dwhole_tools = new List<string>();
+
             string line = String.Empty;
 
             while ((line = datafile.ReadLine()) != null)
             {
-                if(downhole)
-                    txb_DownHole_Read.AppendText(line + Environment.NewLine);
+                if (downhole)
+                {
+                    //txb_DownHole_Read.AppendText(line + Environment.NewLine);
+                    dwhole_tools.Add(line);
+                }
                 else
-                    txb_Uphole_Read.AppendText(line + Environment.NewLine);
+                {
+                    //txb_Uphole_Read.AppendText(line + Environment.NewLine);
+                    uphole_tools.Add(line);       
+                }
             }
+
+            if (downhole)
+            {
+                dwhole_tools.RemoveAt(0);
+                foreach(var str in dwhole_tools)
+                {
+                    //txb_DownHole_Read.AppendText(str + Environment.NewLine);
+                }
+                return dwhole_tools;
+            }    
+            else
+            {
+                uphole_tools.RemoveAt(0);
+                foreach (var str in uphole_tools)
+                {
+                    //txb_Uphole_Read.AppendText(str + Environment.NewLine);
+                }
+                return uphole_tools;
+            }
+
+
+        }
+
+        private void add_remove_result(List<string> uphole, List<string> dwhole,bool add_remove)
+        {
+            int index = 0;
+
+            bool downhole = false;
+
+            if(add_remove)
+            {
+                for (int i = 0; i < Nodes.Count(); i++)
+                {
+                    /* Create label for my result */
+                    Label result_frame = new Label();
+                    /* initialize node properties */
+                    Point result_newLoc = new Point(Nodes[i].Location.X, 100);
+
+                    result_frame.Location = result_newLoc; //default location    
+
+                    result_frame.Name = "lb_result" + (numTool + 1).ToString();
+
+                    if (Nodes[i].BackColor == Color.LightSalmon)
+                    {
+                        result_frame.Text = "Brussels: 24 [V]";
+                        downhole = true;
+                        index = 0;
+                    }
+                    else
+                    {
+                        if (downhole)
+                        {
+                            result_frame.Text = dwhole[index];
+                            index += 1;
+                        }
+                        else
+                        {
+                            result_frame.Text = uphole[index];
+                            index += 1;
+                        }
+
+                    }
+
+                    Size lb_size = new Size(myNode_Size.Width, 200);
+
+                    result_frame.Size = lb_size;
+
+                    /* add node frame to my form */
+                    this.Controls.Add(result_frame);
+                    myResultList.Add(result_frame);
+                }
+            }
+            else
+            {
+                try
+                {
+                    foreach (var result in myResultList)
+                    {
+                        /*
+                         * remove the node out of my form
+                         */
+                        this.Controls.Remove(result);
+                    }
+                    myResultList.Clear();
+                }
+                catch
+                {
+                    MessageBox.Show("Nothing to remove");
+                }
+
+            }
+            
         }
 
         /* tool drag - drop event , when left mouse down */
@@ -659,10 +802,10 @@ namespace BHA
              * user move the tool around
              */
 
-            foreach (var node in myNodeList)
+            foreach (var node in Nodes)
             {
 
-                foreach (var module in myModuleList)
+                foreach (var module in Modules)
                 {
                     // MessageBox.Show("X: " + item.Location.X.ToString() + "Y: " + item.Location.Y.ToString());
                     if (module.Location.X > node.Location.X
@@ -691,24 +834,24 @@ MessageBox.Show("Bounderies x = " + (node.Location.X + myNode_Size.Width).ToStri
                         /* 
                          * update my available node list 
                          */
-                        myAvailableNode[node_index] = true;
-                        myModuleLoc[node_index] = Convert.ToInt32(module.Tag);
+                        availableNodes[node_index] = true;
+                        modLocations[node_index] = Convert.ToInt32(module.Tag);
 
                         /* 
                          * Update the node status 
                          */
                          if(module.Text == "Brussels")
-                            node.BackColor = Color.Red;
+                            node.BackColor = Color.LightSalmon;
                          else
-                            node.BackColor = Color.LightBlue;
+                            node.BackColor = Color.LightSkyBlue;
 
                         /*
                          * only for debug, display out my form
                          */
-                        foreach (var status in myAvailableNode)
+                        foreach (var status in availableNodes)
                             debug_avaiableNode.Text += " " + status.ToString();
 
-                        foreach (var id in myModuleLoc)
+                        foreach (var id in modLocations)
                             debug_NodeID.Text += " " + id.ToString();
 
                         /*
@@ -731,17 +874,17 @@ MessageBox.Show("Bounderies x = " + (node.Location.X + myNode_Size.Width).ToStri
                  */
                 if (!node_occupied)
                 {
-                    myAvailableNode[node_index] = false;
-                    myModuleLoc[node_index] = 0;
+                    availableNodes[node_index] = false;
+                    modLocations[node_index] = 0;
                     node.BackColor = SystemColors.Control;
 
                     debug_avaiableNode.Text = String.Empty;
                     debug_NodeID.Text = String.Empty;
 
-                    foreach (var status in myAvailableNode)
+                    foreach (var status in availableNodes)
                         debug_avaiableNode.Text += " " + status.ToString();
 
-                    foreach (var id in myModuleLoc)
+                    foreach (var id in modLocations)
                         debug_NodeID.Text += " " + id.ToString();
                 }
 
@@ -754,7 +897,7 @@ MessageBox.Show("Bounderies x = " + (node.Location.X + myNode_Size.Width).ToStri
             /* 
              * update new confirm button
              */
-            foreach (var item in myAvailableNode)
+            foreach (var item in availableNodes)
             {
                 if (item == false)
                 {
@@ -781,9 +924,9 @@ MessageBox.Show("Bounderies x = " + (node.Location.X + myNode_Size.Width).ToStri
              * Swapping module
              */
             int myId = 0;
-            foreach (var node in myNodeList)
+            foreach (var node in Nodes)
             {
-                if (myAvailableNode[myId] == true
+                if (availableNodes[myId] == true
                         && module_sel.Location.X > node.Location.X
                         && module_sel.Location.X < (node.Location.X + myNode_Size.Width)
                         && module_sel.Location.Y > node.Location.Y
@@ -803,7 +946,7 @@ MessageBox.Show("Bounderies x = " + (node.Location.X + myNode_Size.Width).ToStri
                     Point module_newLoc = new Point(node.Location.X + offset_x, node.Location.Y + offset_y);
                     module_sel.Location = module_newLoc;
 
-                    myModuleList[myModuleLoc[myId] - 1].Location = drag_Loc;
+                    Modules[modLocations[myId] - 1].Location = drag_Loc;
 
 
                     break;
@@ -811,7 +954,5 @@ MessageBox.Show("Bounderies x = " + (node.Location.X + myNode_Size.Width).ToStri
                 myId++;
             }
         }
-
-
     }
 }

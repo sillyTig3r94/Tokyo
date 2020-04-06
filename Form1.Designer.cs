@@ -37,32 +37,34 @@
             this.debug_toolName = new System.Windows.Forms.Label();
             this.debug_toolVoltage = new System.Windows.Forms.Label();
             this.groupBox_Debug = new System.Windows.Forms.GroupBox();
-            this.bt_myFormat = new System.Windows.Forms.Button();
-            this.txb_DownHole_Read = new System.Windows.Forms.TextBox();
             this.bt_runPython = new System.Windows.Forms.Button();
-            this.txb_Uphole_Read = new System.Windows.Forms.TextBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox_Debug.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // bt_addNode
             // 
+            this.bt_addNode.BackColor = System.Drawing.SystemColors.ControlLight;
             this.bt_addNode.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.bt_addNode.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.bt_addNode.Location = new System.Drawing.Point(50, 344);
+            this.bt_addNode.Location = new System.Drawing.Point(7, 34);
             this.bt_addNode.Margin = new System.Windows.Forms.Padding(4);
             this.bt_addNode.Name = "bt_addNode";
             this.bt_addNode.Size = new System.Drawing.Size(83, 59);
             this.bt_addNode.TabIndex = 0;
             this.bt_addNode.Text = "Add Node";
-            this.bt_addNode.UseVisualStyleBackColor = true;
+            this.bt_addNode.UseVisualStyleBackColor = false;
             this.bt_addNode.Click += new System.EventHandler(this.bt_addNode_Click);
             // 
             // bt_confirmNode
             // 
-            this.bt_confirmNode.BackColor = System.Drawing.SystemColors.Control;
+            this.bt_confirmNode.BackColor = System.Drawing.SystemColors.ControlLight;
             this.bt_confirmNode.Enabled = false;
             this.bt_confirmNode.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.bt_confirmNode.Location = new System.Drawing.Point(228, 344);
+            this.bt_confirmNode.Location = new System.Drawing.Point(184, 34);
             this.bt_confirmNode.Margin = new System.Windows.Forms.Padding(4);
             this.bt_confirmNode.Name = "bt_confirmNode";
             this.bt_confirmNode.Size = new System.Drawing.Size(78, 59);
@@ -73,16 +75,17 @@
             // 
             // bt_removeNode
             // 
+            this.bt_removeNode.BackColor = System.Drawing.SystemColors.ControlLight;
             this.bt_removeNode.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.bt_removeNode.Enabled = false;
             this.bt_removeNode.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.bt_removeNode.Location = new System.Drawing.Point(141, 344);
+            this.bt_removeNode.Location = new System.Drawing.Point(97, 34);
             this.bt_removeNode.Margin = new System.Windows.Forms.Padding(4);
             this.bt_removeNode.Name = "bt_removeNode";
             this.bt_removeNode.Size = new System.Drawing.Size(79, 59);
             this.bt_removeNode.TabIndex = 2;
             this.bt_removeNode.Text = "Remove Node";
-            this.bt_removeNode.UseVisualStyleBackColor = true;
+            this.bt_removeNode.UseVisualStyleBackColor = false;
             this.bt_removeNode.Click += new System.EventHandler(this.bt_removeNode_Click);
             // 
             // debug_avaiableNode
@@ -138,67 +141,60 @@
             this.groupBox_Debug.TabStop = false;
             this.groupBox_Debug.Text = "Debug Box";
             // 
-            // bt_myFormat
-            // 
-            this.bt_myFormat.BackColor = System.Drawing.Color.DarkGray;
-            this.bt_myFormat.Location = new System.Drawing.Point(314, 344);
-            this.bt_myFormat.Name = "bt_myFormat";
-            this.bt_myFormat.Size = new System.Drawing.Size(84, 59);
-            this.bt_myFormat.TabIndex = 3;
-            this.bt_myFormat.Text = "Format Model";
-            this.bt_myFormat.UseVisualStyleBackColor = false;
-            this.bt_myFormat.Visible = false;
-            // 
-            // txb_DownHole_Read
-            // 
-            this.txb_DownHole_Read.Location = new System.Drawing.Point(521, 344);
-            this.txb_DownHole_Read.Multiline = true;
-            this.txb_DownHole_Read.Name = "txb_DownHole_Read";
-            this.txb_DownHole_Read.Size = new System.Drawing.Size(190, 59);
-            this.txb_DownHole_Read.TabIndex = 9;
-            // 
             // bt_runPython
             // 
+            this.bt_runPython.BackColor = System.Drawing.SystemColors.ControlLight;
             this.bt_runPython.Enabled = false;
-            this.bt_runPython.Location = new System.Drawing.Point(404, 344);
+            this.bt_runPython.Location = new System.Drawing.Point(6, 35);
             this.bt_runPython.Name = "bt_runPython";
-            this.bt_runPython.Size = new System.Drawing.Size(109, 59);
+            this.bt_runPython.Size = new System.Drawing.Size(83, 59);
             this.bt_runPython.TabIndex = 10;
-            this.bt_runPython.Text = "Create .bat";
-            this.bt_runPython.UseVisualStyleBackColor = true;
+            this.bt_runPython.Text = "Update Result";
+            this.bt_runPython.UseVisualStyleBackColor = false;
             this.bt_runPython.Click += new System.EventHandler(this.bt_runPython_Click);
             // 
-            // txb_Uphole_Read
+            // groupBox1
             // 
-            this.txb_Uphole_Read.Location = new System.Drawing.Point(717, 344);
-            this.txb_Uphole_Read.Multiline = true;
-            this.txb_Uphole_Read.Name = "txb_Uphole_Read";
-            this.txb_Uphole_Read.Size = new System.Drawing.Size(190, 59);
-            this.txb_Uphole_Read.TabIndex = 11;
+            this.groupBox1.Controls.Add(this.bt_addNode);
+            this.groupBox1.Controls.Add(this.bt_removeNode);
+            this.groupBox1.Controls.Add(this.bt_confirmNode);
+            this.groupBox1.Location = new System.Drawing.Point(50, 297);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(274, 103);
+            this.groupBox1.TabIndex = 12;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Add/Remove Tools";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.bt_runPython);
+            this.groupBox2.Location = new System.Drawing.Point(330, 297);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(105, 103);
+            this.groupBox2.TabIndex = 13;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Tool Ultilities";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(957, 414);
-            this.Controls.Add(this.txb_Uphole_Read);
-            this.Controls.Add(this.bt_runPython);
-            this.Controls.Add(this.txb_DownHole_Read);
-            this.Controls.Add(this.bt_myFormat);
-            this.Controls.Add(this.bt_addNode);
-            this.Controls.Add(this.bt_removeNode);
+            this.ClientSize = new System.Drawing.Size(957, 410);
+            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox_Debug);
-            this.Controls.Add(this.bt_confirmNode);
             this.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "BHA Calculation";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox_Debug.ResumeLayout(false);
             this.groupBox_Debug.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -214,10 +210,9 @@
         private System.Windows.Forms.Label debug_toolName;
         private System.Windows.Forms.Label debug_toolVoltage;
         private System.Windows.Forms.GroupBox groupBox_Debug;
-        private System.Windows.Forms.Button bt_myFormat;
-        private System.Windows.Forms.TextBox txb_DownHole_Read;
         private System.Windows.Forms.Button bt_runPython;
-        private System.Windows.Forms.TextBox txb_Uphole_Read;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox groupBox2;
     }
 }
 

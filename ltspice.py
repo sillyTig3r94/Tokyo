@@ -60,6 +60,10 @@ LTR_BHA = LTSpiceRawRead(raw_path)
 # =============================================================================
 voltage_uh, current_uh, voltage_dh, current_dh  = lt_ult.get_tool(LTR_BHA)
 
+pwr_dh = [voltage_dh[i]*current_dh[i] for i in range(len(voltage_dh))]
+
+pwr_uh = [voltage_uh[i]*current_uh[i] for i in range(len(voltage_uh))]
+
 # =============================================================================
 #                       OUTPUT CALCULATION
 # =============================================================================
