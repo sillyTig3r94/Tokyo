@@ -6,7 +6,7 @@ Created on Wed Apr  1 11:28:56 2020
 """
 from tools_param import *
 # =============================================================================
-#                           LTSPICE FUNCTIONS/METHODS
+#                       Query voltage measurement on LTPSICE
 # =============================================================================
 def get_voltage(arg):
     item = str(arg).splitlines()
@@ -18,123 +18,157 @@ def get_voltage(arg):
             else:
                 return voltage
     return "Invalid"
-
+# =============================================================================
+#                       Query current measurement on LTSPICE
+# =============================================================================
 def get_current(arg):
     item = str(arg).splitlines()
     for attr in item:
         if attr == r"type:'device_current'":
-            current = round(float(item[3].strip("[]")),4)
-            if current < 0.00000000001:
+            # current might be negative because of the direction convention on LTSPICE
+            # so using absolute value here
+            current = abs(round(float(item[3].strip("[]")),4)) 
+            if current < 0.005:
                 return 0
             else:
                 return current
     return "Invalid" 
-   
+# =============================================================================
+#                       Setting parameter for LTSPICE
+# =============================================================================
 def set_params(tools_setup):
     params_file = open('params_setting.txt','w')
     
     myIndex = 0
-   
-    flg_uphole = True
-    
-    uphole_tools = []
-    
-    downhole_tools = []
-
-    params_file.write(';Source Tools Paramter:' + '\n')
-    
-    # write params source base
-    for tool in tools_setup:
-        if tools_dict[tool]['id'] == 0:      
-            params_file.write('.param' + ' ' + 'V_source = ' + str(tools_dict[tool]['operate_volt']) + '\n')
-            params_file.write('.param' + ' ' + 'R_source = ' + str(tools_dict[tool]['resistance']) + '\n') 
-            flg_uphole = False
-            continue
-            
-        if flg_uphole:
-            uphole_tools.append(tool)
-        else:
-            downhole_tools.append(tool)
-            
-
- 
+     
     # write params for uphole tools
-    params_file.write('\n' + ';Uphole Tools Paramter: ' + '\n')
-    for index, tool in enumerate(uphole_tools,start = 1):
-        params_file.write('.param' + ' ' + 'P_uh_load' + str(index) + ' = ' + str(tools_dict[tool]['avg_power']) + '\n')
-        params_file.write('.param' + ' ' + 'R_uh_' + str(index) + ' = ' + str(tools_dict[tool]['resistance']) + '\n') 
-        params_file.write('.param' + ' ' + 'load' + str(index) + '_uh = -1' + '\n')
-        myIndex = index
-    # write params to remove unused downhole tools    
-    for i in range(myIndex + 1, 3 + 1):
-        params_file.write('.param' + ' ' + 'P_uh_load' + str(i) + ' = ' + str(tools_dict["DUMMY"]['avg_power']) + '\n')
-        params_file.write('.param' + ' ' + 'R_uh_' + str(i) + ' = ' + str(tools_dict['DUMMY']['resistance']) + '\n') 
-        params_file.write('.param' + ' ' + 'load' + str(i) + '_uh = 1' + '\n')  
+    for index, tool in enumerate(tools_setup,start = 1):
         
-    # write params for downhole tools
-    params_file.write('\n' + ';Downhold Tools Paramter: ' + '\n')
-    for index, tool in enumerate(downhole_tools,start = 1):
-        params_file.write('.param' + ' ' + 'P_dh_load' + str(index) + ' = ' + str(tools_dict[tool]['avg_power']) + '\n')
-        params_file.write('.param' + ' ' + 'R_dh_' + str(index) + ' = ' + str(tools_dict[tool]['resistance']) + '\n') 
-        params_file.write('.param' + ' ' + 'load' + str(index) + '_dh = -1' + '\n')
-        myIndex = index      
-    # write params to remove unused downhole tools
-    for i in range(myIndex + 1, 7 + 1):
-        params_file.write('.param' + ' ' + 'P_dh_load' + str(i) + ' = ' + str(tools_dict["DUMMY"]['avg_power']) + '\n')
-        params_file.write('.param' + ' ' + 'R_dh_' + str(i) + ' = ' + str(tools_dict['DUMMY']['resistance']) + '\n') 
-        params_file.write('.param' + ' ' + 'load' + str(i) + '_dh = 1' + '\n')
-               
+        params_file.write('\n' + ';Tools : ' + tool + '\n')
+
+            
+        # Enable node
+        params_file.write('.param' + ' ' + 'enable_load' + str(index) + ' = -5' + '\n')
+        params_file.write('.param' + ' ' + 'R' + str(index) + ' = ' + str(tools_dict[tool]['wire_res']) + '\n')
+        
+        # Set average / peak power params for calculation
+        if tools_dict[tool]['calc_option'] == 'average':
+            params_file.write('.param' + ' ' + 'P_load' + str(index) + ' = ' + str(tools_dict[tool]['avg_power']) + '\n')
+            params_file.write('.param' + ' ' + 'Rmin_load' + str(index) + ' = ' + str(tools_dict[tool]['min_volt']**2 / tools_dict[tool]['avg_power']) + '\n')
+        else:
+            params_file.write('.param' + ' ' + 'P_load' + str(index) + ' = ' + str(tools_dict[tool]['peak_power']) + '\n')
+            params_file.write('.param' + ' ' + 'Rmin_load' + str(index) + ' = ' + str(tools_dict[tool]['min_volt']**2 / tools_dict[tool]['peak_power']) + '\n')
+            
+        # Configure sink load
+        if tools_dict[tool]['sink'] == True:
+            params_file.write('.param' + ' ' + 'enable_sink' + str(index) + '= -5' + '\n')
+        else:
+           params_file.write('.param' + ' ' + 'enable_sink' + str(index) + ' = 5' + '\n')
+           
+        # Configure source (generator + battery)
+        if tools_dict[tool]['source'] == True:
+            
+            if tools_dict[tool]['src_type'] == 'gen':
+                params_file.write('.param' + ' ' + 'enable_gen'  + str(index) + ' = -5' + '\n')
+                params_file.write('.param' + ' ' + 'V_gen'  + str(index) + ' = ' + str(tools_dict[tool]['source_voltage'])  + '\n') 
+                params_file.write('.param' + ' ' + 'enable_batt'  + str(index) + ' = 5' + '\n')
+                params_file.write('.param' + ' ' + 'V_batt'  + str(index) + ' = 0' + '\n')                
+            elif tools_dict[tool]['src_type'] == 'batt':
+                params_file.write('.param' + ' ' + 'enable_gen'  + str(index) + ' = 5' + '\n')
+                params_file.write('.param' + ' ' + 'V_gen'  + str(index) + ' = 0' + '\n')  
+                params_file.write('.param' + ' ' + 'enable_batt' + str(index) + ' = -5' + '\n')
+                params_file.write('.param' + ' ' + 'V_batt'  + str(index) + ' = ' + str(tools_dict[tool]['source_voltage'])  + '\n')
+            else:
+                params_file.write('.param' + ' ' + 'enable_gen'  + str(index) + ' = -5' + '\n')
+                params_file.write('.param' + ' ' + 'V_gen'  + str(index) + ' = 0' + '\n')
+                params_file.write('.param' + ' ' + 'enable_batt' + str(index) + ' = 5' + '\n')
+                params_file.write('.param' + ' ' + 'V_batt'  + str(index) + ' = 0' + '\n')    
+        else:
+            params_file.write('.param' + ' ' + 'enable_gen'  + str(index) + ' = 5' + '\n')
+            params_file.write('.param' + ' ' + 'V_gen'  + str(index) + ' = 0' + '\n')    
+            params_file.write('.param' + ' ' + 'enable_batt' + str(index) + ' = 5' + '\n')  
+            params_file.write('.param' + ' ' + 'V_batt'  + str(index) + ' = 0' + '\n')    
+        
+           
+           
+                  
+        myIndex = index
+        
+    # write params to remove unused uphole tools    
+    for index in range(myIndex + 1,20 + 1):
+        
+        params_file.write('\n' + ';Tools : Dummy ' + '\n')
+        # disable node
+        params_file.write('.param' + ' ' + 'enable_load' + str(index) + ' = 5' + '\n')   
+        params_file.write('.param' + ' ' + 'R' + str(index) + ' = ' + str(tools_dict['DUMMY']['wire_res']) + '\n') 
+        # Since this node is not valid so the value of this does not matter
+        params_file.write('.param' + ' ' + 'P_load' + str(index) + ' = ' + str(tools_dict["DUMMY"]['avg_power']) + '\n')
+        params_file.write('.param' + ' ' + 'Rmin_load' + str(index) + ' = ' + str(tools_dict["DUMMY"]['min_volt']**2 / tools_dict["DUMMY"]['avg_power']) + '\n')
+        params_file.write('.param' + ' ' + 'enable_sink' + str(index) + ' = 5' + '\n')
+        params_file.write('.param' + ' ' + 'enable_gen'  + str(index) + ' = 5' + '\n')
+        params_file.write('.param' + ' ' + 'V_gen'  + str(index) + ' = 0' + '\n')  
+        params_file.write('.param' + ' ' + 'enable_batt' + str(index) + ' = 5' + '\n')
+        params_file.write('.param' + ' ' + 'V_batt'  + str(index) + ' = 0' + '\n') 
+
+                        
     params_file.close()
+
+# =============================================================================
+# 
+# =============================================================================
     
-    return uphole_tools,downhole_tools
-    
-def get_tool(LTSPICE):
+def get_tool(LTSPICE,tool_setup):
     
     keyword = LTSPICE.get_trace_names()
     
-    tools_uh_V = []
-    tools_uh_I = []
-    tools_dh_V = []
-    tools_dh_I = []
+    tools_V , tools_I = [] , [] 
     
-    volt_dh_index = 1 
+    tools_Gen , tools_Batt = [] , []
+        
+    volt_index = 1 
     
-    curr_dh_index = 7
+    curr_index = 19
     
-    volt_uh_index = 1 
+    gen_index = 19
     
-    curr_uh_index = 1
+    batt_index = 19
+    
     
     for key in keyword:
-        key_dh_volt = 'V(v_dh_load' + str(volt_dh_index) + ')' 
-        key_dh_curr = 'I(Load_dh_' + str(curr_dh_index) + ')'
-        key_uh_volt = 'V(v_uh_load' + str(volt_uh_index) + ')' 
-        key_uh_curr = 'I(Load_uh_' + str(curr_uh_index) + ')'
+        key_volt = 'V(v_load' + str(volt_index) + ')' 
+        key_curr = 'I(Load' + str(curr_index) + ')'
+        key_gen = 'I(Gen' + str(gen_index) + ')'
+        key_batt = 'I(Batt' + str(batt_index) + ')'
         
-        if key == key_dh_volt:
+        if key == key_volt:
             V = get_voltage(LTSPICE.get_trace(key))
-            if V != 0:
-                tools_dh_V.append(V)
-            volt_dh_index += 1
+            tools_V.append(V)
+            volt_index += 1
             
-        if key == key_dh_curr:
+        if key == key_curr:
             I = get_current(LTSPICE.get_trace(key))
-            if I != 0:
-                tools_dh_I.append(I)
-            curr_dh_index -= 1
+            tools_I.append(I)
+            curr_index -= 1
+        if key == key_gen:
+            Gen = get_current(LTSPICE.get_trace(key))
+            tools_Gen.append(Gen)
+            gen_index -= 1
+        if key == key_batt:
+            Batt = get_current(LTSPICE.get_trace(key))
+            tools_Batt.append(Batt)
+            batt_index -= 1 
             
-        if key == key_uh_volt:
-            V = get_voltage(LTSPICE.get_trace(key))
-            if V != 0:
-                tools_uh_V.append(V)
-            volt_uh_index += 1
-            
-        if key == key_uh_curr:
-            I = get_current(LTSPICE.get_trace(key))
-            if I != 0:
-                tools_uh_I.append(I)
-            curr_uh_index += 1
-            
-    return tools_uh_V, tools_uh_I, tools_dh_V, tools_dh_I
+                       
+    #remove unsed uphole tools    
+    #sliding
+    tools_P = []
+    tools_I.reverse()
+    tools_Gen.reverse()
+    tools_Batt.reverse()
+    for index in range(len(tools_V)):
+        tools_P.append(round(tools_I[index]*tools_V[index],2))
+    
+#    return tools_uh_V, tools_uh_I, tools_dh_V, tools_dh_I  
+    
+    return tools_V,tools_I,tools_P,tools_Gen,tools_Batt
 
-#myTool = set_params(['Brussels','RioBase','Muscat','GP9600'])
