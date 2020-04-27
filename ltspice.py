@@ -22,49 +22,74 @@ import ltspice_utilities as lt_ult
 
 from tools_param import *
 
+from tool_database import *
 
+from tool_analysis import *
 
 # =============================================================================
 #                       GETTING WORKING DIRECTORY PATH
 # =============================================================================
 path = os.getcwd()
 
-asc_path = os.path.join(path,"BHA_setup.asc")
+asc_path = os.path.join(path,"BHA_setup_Extra.asc")
 
-raw_path = os.path.join(path,"BHA_setup.raw")
+raw_path = os.path.join(path,"BHA_setup_Extra.raw")
 
-
-
-# =============================================================================
-#                       PARAMETER SETTING
-# =============================================================================
-
-tools_setup = get_tool_params()
 
 LTC_BHA = LTCommander(asc_path)
 
-up_tools, dw_tools = lt_ult.set_params(tools_setup)
+database = import_tool_database()
+# =============================================================================
+#                       LTSPICE PARAMETER SETTING
+# =============================================================================
 
-#up_tools, dw_tools = lt_ult.set_params(['Yoko','Brussels','Muscat','ESRX1','RioBase','ESTX','GP9600'])
+# =============================================================================
+#                       OLD LTSPICE CONFIGURATION
+# =============================================================================
+#tool_name, tool_sink, tool_source, tool_calc, tool_enable = get_tool_params()
 
+#set_calc_setup(tool_name, tool_sink, tool_source, tool_calc, tool_enable)
+    
+#up_tools, dw_tools = lt_ult.set_params(tool_name)
+
+#config source typ here
+
+#config = lt_ult.set_params(tool_name)
+# =============================================================================
+#                       NEW LTSPICE CONFIGURATION
+# =============================================================================
+setting = import_tool_setting()
+
+ltspice_setup(setting,database)
 # =============================================================================
 #                       RUN LTSPICE.ASC         
 # =============================================================================
-
 LTC_BHA.run()
 
 LTR_BHA = LTSpiceRawRead(raw_path)
 
+#export_tool_param()
+#
+#import_tool_param()
+
 # =============================================================================
 #                       COLLECTING DATA
 # =============================================================================
-voltage_uh, current_uh, voltage_dh, current_dh  = lt_ult.get_tool(LTR_BHA)
+
+LTC_BHA.__del__()
+
+V,I,P,Generator,Battery  = lt_ult.get_tool(LTR_BHA,setting)
 
 # =============================================================================
 #                       OUTPUT CALCULATION
 # =============================================================================
-write_to_Apps(voltage_dh,current_dh,dw_tools,Mode = 'down')
-write_to_Apps(voltage_uh,current_uh,up_tools,Mode = 'up')
+write_Report_to_Apps(V,I,P,Generator,Battery,setting)
+
+write_Error_to_Apps(V,I,P,Generator,Battery,setting,database)
+
+
+
+
 
  
 
